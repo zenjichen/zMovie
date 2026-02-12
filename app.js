@@ -19,6 +19,8 @@ const state = {
     currentMovie: null,
     searchQuery: '',
 };
+// Expose state globally so player.js and router.js can access it
+window.state = state;
 
 // DOM Elements
 const elements = {
@@ -211,6 +213,7 @@ const showMovieDetail = async (slug) => {
 
     const movie = data.data.item;
     state.currentMovie = movie;
+    window.currentMovie = movie; // Also store in window to prevent loss
 
     // Debug: Log movie data to see structure
     console.log('Movie Detail Data:', movie);
@@ -489,6 +492,14 @@ elements.menuToggle.addEventListener('click', () => {
     const navLinks = document.querySelector('.nav-links');
     navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
 });
+
+// Expose functions globally for router.js and player.js
+window.fetchAPI = fetchAPI;
+window.createMovieCard = createMovieCard;
+window.API_ENDPOINTS = API_ENDPOINTS;
+window.searchMovies = searchMovies;
+window.loadFilters = loadFilters;
+window.showMovieDetail = showMovieDetail;
 
 // Initialize App
 const init = async () => {
