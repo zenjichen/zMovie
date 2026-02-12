@@ -115,12 +115,23 @@ const loadMovies = async (endpoint, container, page = 1) => {
 
     const data = await fetchAPI(endpoint, { page });
 
-    if (!data || !data.data || !data.data.items) {
+    if (!data) {
         showError(container);
         return;
     }
 
-    const movies = data.data.items;
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        // Format 1: {status: true, items: [...]}
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        // Format 2: {status: "success", data: {items: [...]}}
+        movies = data.data.items;
+    } else {
+        showError(container);
+        return;
+    }
 
     if (movies.length === 0) {
         showError(container, 'Không có phim nào');
@@ -137,11 +148,23 @@ const loadMovies = async (endpoint, container, page = 1) => {
 const loadHeroMovie = async () => {
     const data = await fetchAPI(API_ENDPOINTS.home, { page: 1 });
 
-    if (!data || !data.data || !data.data.items || data.data.items.length === 0) {
+    if (!data) {
         return;
     }
 
-    const movie = data.data.items[0];
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        movies = data.data.items;
+    }
+
+    if (!movies || movies.length === 0) {
+        return;
+    }
+
+    const movie = movies[0];
     const heroSlide = document.querySelector('.hero-slide');
     const heroBg = document.querySelector('.hero-bg');
 
@@ -279,13 +302,24 @@ const searchMovies = async (query) => {
 
     const data = await fetchAPI(API_ENDPOINTS.search, { keyword: query });
 
-    if (!data || !data.data || !data.data.items) {
+    if (!data) {
+        showError(elements.newMovies, 'Không tìm thấy kết quả');
+        return;
+    }
+
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        movies = data.data.items;
+    } else {
         showError(elements.newMovies, 'Không tìm thấy kết quả');
         return;
     }
 
     elements.newMovies.innerHTML = '';
-    data.data.items.forEach(movie => {
+    movies.forEach(movie => {
         elements.newMovies.appendChild(createMovieCard(movie));
     });
 
@@ -322,13 +356,24 @@ const loadFilters = async () => {
 window.loadMoviesByGenre = async (slug) => {
     const data = await fetchAPI(`/v1/api/the-loai/${slug}`, { page: 1 });
 
-    if (!data || !data.data || !data.data.items) {
+    if (!data) {
+        showError(elements.newMovies, 'Không có phim nào trong thể loại này');
+        return;
+    }
+
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        movies = data.data.items;
+    } else {
         showError(elements.newMovies, 'Không có phim nào trong thể loại này');
         return;
     }
 
     elements.newMovies.innerHTML = '';
-    data.data.items.slice(0, 12).forEach(movie => {
+    movies.slice(0, 12).forEach(movie => {
         elements.newMovies.appendChild(createMovieCard(movie));
     });
 
@@ -339,13 +384,24 @@ window.loadMoviesByGenre = async (slug) => {
 window.loadMoviesByCountry = async (slug) => {
     const data = await fetchAPI(`/v1/api/quoc-gia/${slug}`, { page: 1 });
 
-    if (!data || !data.data || !data.data.items) {
+    if (!data) {
+        showError(elements.newMovies, 'Không có phim nào từ quốc gia này');
+        return;
+    }
+
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        movies = data.data.items;
+    } else {
         showError(elements.newMovies, 'Không có phim nào từ quốc gia này');
         return;
     }
 
     elements.newMovies.innerHTML = '';
-    data.data.items.slice(0, 12).forEach(movie => {
+    movies.slice(0, 12).forEach(movie => {
         elements.newMovies.appendChild(createMovieCard(movie));
     });
 
