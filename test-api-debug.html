@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OPhim API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #f31260;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #9333ea;
+        }
+
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #0f0;
+        }
+
+        .error {
+            color: #f00;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Test OPhim API</h1>
+
+    <div class="test-section">
+        <h2>Test API Domains</h2>
+        <button onclick="testDomain('https://ophim1.com')">Test ophim1.com</button>
+        <button onclick="testDomain('https://ophim.cc')">Test ophim.cc</button>
+        <button onclick="testDomain('https://ophim17.cc')">Test ophim17.cc</button>
+        <button onclick="testDomain('https://phimapi.com')">Test phimapi.com</button>
+        <div id="domainResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Movie Detail API</h2>
+        <input type="text" id="movieSlug" placeholder="Enter movie slug (e.g., cross-phan-2)"
+            style="padding: 10px; width: 300px;">
+        <button onclick="testMovieDetail()">Test Movie Detail</button>
+        <div id="movieResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test List Movies API</h2>
+        <button onclick="testListMovies()">Test List Movies</button>
+        <div id="listResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://ophim1.com';
+
+        async function testDomain(domain) {
+            const resultDiv = document.getElementById('domainResult');
+            resultDiv.innerHTML = '<p>Testing ' + domain + '...</p>';
+
+            try {
+                const response = await fetch(domain + '/danh-sach/phim-moi-cap-nhat?page=1');
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <p class="success">✅ ${domain} is working!</p>
+                    <pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ ${domain} failed: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testMovieDetail() {
+            const slug = document.getElementById('movieSlug').value || 'cross-phan-2';
+            const resultDiv = document.getElementById('movieResult');
+            resultDiv.innerHTML = '<p>Testing movie detail for: ' + slug + '...</p>';
+
+            const endpoints = [
+                `/v1/api/phim/${slug}`,
+                `/phim/${slug}`,
+                `/api/phim/${slug}`
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const url = API_BASE + endpoint;
+                    console.log('Testing:', url);
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Endpoint working: ${endpoint}</p>
+                        <p><strong>Movie:</strong> ${data.data?.item?.name || data.movie?.name || 'N/A'}</p>
+                        <p><strong>Episodes:</strong> ${data.data?.item?.episodes?.length || data.movie?.episodes?.length || 0}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    return;
+                } catch (error) {
+                    console.error('Failed:', endpoint, error);
+                }
+            }
+
+            resultDiv.innerHTML = `<p class="error">❌ All endpoints failed!</p>`;
+        }
+
+        async function testListMovies() {
+            const resultDiv = document.getElementById('listResult');
+            resultDiv.innerHTML = '<p>Testing list movies...</p>';
+
+            try {
+                const response = await fetch(API_BASE + '/danh-sach/phim-moi-cap-nhat?page=1');
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <p class="success">✅ List API working!</p>
+                    <p><strong>Total items:</strong> ${data.items?.length || data.data?.items?.length || 0}</p>
+                    <pre>${JSON.stringify(data, null, 2).substring(0, 1000)}...</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Failed: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Auto test on load
+        window.onload = () => {
+            console.log('Auto-testing default domain...');
+            testDomain(API_BASE);
+        };
+    </script>
+</body>
+
+</html>

@@ -212,6 +212,11 @@ const showMovieDetail = async (slug) => {
     const movie = data.data.item;
     state.currentMovie = movie;
 
+    // Debug: Log movie data to see structure
+    console.log('Movie Detail Data:', movie);
+    console.log('Movie Episodes:', movie.episodes);
+    console.log('Movie Episode Count:', movie.episodes?.length);
+
     // Fix poster URL - OPhim API returns just filenames or paths
     let posterUrl = movie.poster_url || movie.thumb_url || 'https://via.placeholder.com/300x450?text=No+Image';
     if (posterUrl && !posterUrl.startsWith('http')) {
