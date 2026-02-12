@@ -90,6 +90,7 @@ const createMovieCard = (movie) => {
                 ${movie.lang ? `<span>${movie.lang}</span>` : ''}
             </div>
         </div>
+        <div class="movie-title-bottom">${movie.name}</div>
     `;
 
     return card;

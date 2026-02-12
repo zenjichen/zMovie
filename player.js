@@ -13,13 +13,57 @@ window.playEpisode = (embedUrl, episodeName, serverIndex = 0, episodeIndex = 0) 
     elements.playerModal.classList.add('active');
 
     const movie = window.state?.currentMovie;
-    if (!movie || !movie.episodes) {
+
+    // Debug logging
+    console.log('Player - Current Movie:', movie);
+    console.log('Player - Episodes:', movie?.episodes);
+
+    // Validate movie data
+    if (!movie) {
         elements.playerContainer.innerHTML = `
             <div class="player-error">
-                <p>Không thể tải phim. Vui lòng thử lại sau.</p>
+                <p>Không tìm thấy thông tin phim. Vui lòng thử lại.</p>
+                <button onclick="closePlayer()" class="btn btn-primary">Đóng</button>
             </div>
         `;
         return;
+    }
+
+    if (!movie.episodes || !Array.isArray(movie.episodes) || movie.episodes.length === 0) {
+        elements.playerContainer.innerHTML = `
+            <div class="player-error">
+                <p>Phim này chưa có tập nào để xem.</p>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 10px;">
+                    Vui lòng thử lại sau hoặc chọn phim khác.
+                </p>
+                <button onclick="closePlayer()" class="btn btn-primary" style="margin-top: 20px;">Đóng</button>
+            </div>
+        `;
+        return;
+    }
+
+    // Validate server index
+    if (!movie.episodes[serverIndex]) {
+        console.error('Invalid server index:', serverIndex);
+        serverIndex = 0;
+    }
+
+    const currentServer = movie.episodes[serverIndex];
+
+    // Validate server data
+    if (!currentServer.server_data || !Array.isArray(currentServer.server_data) || currentServer.server_data.length === 0) {
+        elements.playerContainer.innerHTML = `
+            <div class="player-error">
+                <p>Server này không có dữ liệu phim.</p>
+                <button onclick="closePlayer()" class="btn btn-primary" style="margin-top: 20px;">Đóng</button>
+            </div>
+        `;
+        return;
+    }
+
+    // Validate episode index
+    if (episodeIndex >= currentServer.server_data.length) {
+        episodeIndex = 0;
     }
 
     // Build server tabs
@@ -35,7 +79,6 @@ window.playEpisode = (embedUrl, episodeName, serverIndex = 0, episodeIndex = 0) 
     `).join('');
 
     // Build episode list for current server
-    const currentServer = movie.episodes[serverIndex];
     const episodeList = currentServer.server_data.map((ep, idx) => `
         <button class="episode-item ${idx === episodeIndex ? 'active' : ''}" 
                 onclick="playEpisode('${ep.link_embed.replace(/'/g, "\\'")}', '${ep.name.replace(/'/g, "\\'")}', ${serverIndex}, ${idx})"
