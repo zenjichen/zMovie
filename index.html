@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="player.css">
     <link rel="stylesheet" href="router.css">
+    <link rel="stylesheet" href="dropdown.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -163,6 +164,7 @@
                 </div>
             </section>
 
+
             <!-- Hoạt hình -->
             <section class="movie-section">
                 <div class="section-header">
@@ -178,6 +180,17 @@
                     <div class="movie-card skeleton"></div>
                 </div>
             </section>
+
+            <!-- Filtered Movies (Genre/Country/Actor) -->
+            <section class="movie-section" id="filteredSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title" id="filteredTitle">Kết quả lọc</h2>
+                    <a href="#" onclick="window.location.hash=''; return false;" class="see-all">← Quay lại trang
+                        chủ</a>
+                </div>
+                <div class="movie-grid" id="filteredMovies"></div>
+            </section>
+
         </div>
     </main>
 

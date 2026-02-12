@@ -1,4 +1,4 @@
-// Router and Advanced Search Features
+// Router and Advanced Search Features - Fixed Version
 
 // ========== HASH ROUTING ==========
 class Router {
@@ -27,6 +27,12 @@ class Router {
     }
 
     loadHome() {
+        // Hide filtered section
+        const filteredSection = document.getElementById('filteredSection');
+        if (filteredSection) {
+            filteredSection.style.display = 'none';
+        }
+
         // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -36,20 +42,44 @@ class Router {
 
         const genreName = window.state?.genres?.find(g => g.slug === slug)?.name || slug;
 
-        // Update page title
-        document.querySelector('.section-title')?.scrollIntoView({ behavior: 'smooth' });
+        // Show filtered section
+        const filteredSection = document.getElementById('filteredSection');
+        const filteredTitle = document.getElementById('filteredTitle');
+        const filteredMovies = document.getElementById('filteredMovies');
+
+        if (!filteredSection || !filteredTitle || !filteredMovies) return;
+
+        filteredSection.style.display = 'block';
+        filteredTitle.textContent = `Thể loại: ${genreName}`;
+        filteredMovies.innerHTML = '<div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>';
+
+        // Scroll to filtered section
+        filteredSection.scrollIntoView({ behavior: 'smooth' });
 
         // Load movies
-        await window.loadMoviesByGenre(slug);
+        const data = await window.fetchAPI(`/v1/api/the-loai/${slug}`, { page: 1 });
 
-        // Update section title
-        const sectionTitle = document.querySelector('#newMovies').previousElementSibling;
-        if (sectionTitle) {
-            sectionTitle.innerHTML = `
-                <h2>Thể loại: ${genreName}</h2>
-                <a href="#" onclick="window.location.hash=''; return false;">← Quay lại trang chủ</a>
-            `;
+        if (!data) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào trong thể loại này</div>';
+            return;
         }
+
+        let movies = [];
+        if (data.items) {
+            movies = data.items;
+        } else if (data.data && data.data.items) {
+            movies = data.data.items;
+        }
+
+        if (movies.length === 0) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào trong thể loại này</div>';
+            return;
+        }
+
+        filteredMovies.innerHTML = '';
+        movies.forEach(movie => {
+            filteredMovies.appendChild(window.createMovieCard(movie));
+        });
     }
 
     async loadCountry(slug) {
@@ -57,20 +87,44 @@ class Router {
 
         const countryName = window.state?.countries?.find(c => c.slug === slug)?.name || slug;
 
-        // Update page title
-        document.querySelector('.section-title')?.scrollIntoView({ behavior: 'smooth' });
+        // Show filtered section
+        const filteredSection = document.getElementById('filteredSection');
+        const filteredTitle = document.getElementById('filteredTitle');
+        const filteredMovies = document.getElementById('filteredMovies');
+
+        if (!filteredSection || !filteredTitle || !filteredMovies) return;
+
+        filteredSection.style.display = 'block';
+        filteredTitle.textContent = `Quốc gia: ${countryName}`;
+        filteredMovies.innerHTML = '<div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>';
+
+        // Scroll to filtered section
+        filteredSection.scrollIntoView({ behavior: 'smooth' });
 
         // Load movies
-        await window.loadMoviesByCountry(slug);
+        const data = await window.fetchAPI(`/v1/api/quoc-gia/${slug}`, { page: 1 });
 
-        // Update section title
-        const sectionTitle = document.querySelector('#newMovies').previousElementSibling;
-        if (sectionTitle) {
-            sectionTitle.innerHTML = `
-                <h2>Quốc gia: ${countryName}</h2>
-                <a href="#" onclick="window.location.hash=''; return false;">← Quay lại trang chủ</a>
-            `;
+        if (!data) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào từ quốc gia này</div>';
+            return;
         }
+
+        let movies = [];
+        if (data.items) {
+            movies = data.items;
+        } else if (data.data && data.data.items) {
+            movies = data.data.items;
+        }
+
+        if (movies.length === 0) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào từ quốc gia này</div>';
+            return;
+        }
+
+        filteredMovies.innerHTML = '';
+        movies.forEach(movie => {
+            filteredMovies.appendChild(window.createMovieCard(movie));
+        });
     }
 
     async loadSearch(query) {
@@ -236,25 +290,25 @@ class ActorSearch {
 
 // ========== SEARCH BY ACTOR ==========
 window.searchMoviesByActor = async (actorName) => {
-    const elements = {
-        newMovies: document.getElementById('newMovies')
-    };
+    // Use filtered section
+    const filteredSection = document.getElementById('filteredSection');
+    const filteredTitle = document.getElementById('filteredTitle');
+    const filteredMovies = document.getElementById('filteredMovies');
 
-    if (!elements.newMovies) return;
+    if (!filteredSection || !filteredTitle || !filteredMovies) return;
 
-    // Show loading
-    elements.newMovies.innerHTML = `
-        <div style="text-align: center; padding: 60px; color: var(--text-secondary);">
-            <div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>
-            <p style="margin-top: 20px;">Đang tìm phim của ${actorName}...</p>
-        </div>
-    `;
+    filteredSection.style.display = 'block';
+    filteredTitle.textContent = `🎭 Phim của diễn viên: ${actorName}`;
+    filteredMovies.innerHTML = '<div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>';
+
+    // Scroll to filtered section
+    filteredSection.scrollIntoView({ behavior: 'smooth' });
 
     // Search for movies
     const data = await window.fetchAPI(window.API_ENDPOINTS.search, { keyword: actorName });
 
     if (!data) {
-        elements.newMovies.innerHTML = `
+        filteredMovies.innerHTML = `
             <div style="text-align: center; padding: 60px; color: var(--text-secondary);">
                 Không tìm thấy phim nào của diễn viên "${actorName}"
             </div>
@@ -270,15 +324,15 @@ window.searchMoviesByActor = async (actorName) => {
     }
 
     // Filter movies that actually have this actor
-    const filteredMovies = movies.filter(movie => {
+    const filteredMoviesList = movies.filter(movie => {
         if (!movie.actor || !Array.isArray(movie.actor)) return false;
         return movie.actor.some(actor =>
             actor.toLowerCase().includes(actorName.toLowerCase())
         );
     });
 
-    if (filteredMovies.length === 0) {
-        elements.newMovies.innerHTML = `
+    if (filteredMoviesList.length === 0) {
+        filteredMovies.innerHTML = `
             <div style="text-align: center; padding: 60px; color: var(--text-secondary);">
                 Không tìm thấy phim nào của diễn viên "${actorName}"
             </div>
@@ -286,23 +340,11 @@ window.searchMoviesByActor = async (actorName) => {
         return;
     }
 
-    // Update section title
-    const sectionTitle = elements.newMovies.previousElementSibling;
-    if (sectionTitle) {
-        sectionTitle.innerHTML = `
-            <h2>🎭 Phim của diễn viên: ${actorName}</h2>
-            <a href="#" onclick="window.location.hash=''; return false;">← Quay lại trang chủ</a>
-        `;
-    }
-
     // Display movies
-    elements.newMovies.innerHTML = '';
-    filteredMovies.forEach(movie => {
-        elements.newMovies.appendChild(window.createMovieCard(movie));
+    filteredMovies.innerHTML = '';
+    filteredMoviesList.forEach(movie => {
+        filteredMovies.appendChild(window.createMovieCard(movie));
     });
-
-    // Scroll to results
-    elements.newMovies.scrollIntoView({ behavior: 'smooth' });
 };
 
 // ========== UPDATE GENRE AND COUNTRY LINKS ==========

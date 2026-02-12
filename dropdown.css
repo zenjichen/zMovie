@@ -1,0 +1,121 @@
+/* Dropdown Menu Styles - Full Display Without Scroll */
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-toggle::after {
+    content: '▼';
+    font-size: 0.7em;
+    transition: transform 0.3s ease;
+}
+
+.dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    min-width: 250px;
+    max-width: 400px;
+    padding: 10px;
+    margin-top: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    /* Grid layout for full display */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+
+    /* Max height with scroll if needed */
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 15px;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-secondary);
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+/* Scrollbar for dropdown */
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        grid-template-columns: 1fr;
+        min-width: 200px;
+        max-height: 50vh;
+    }
+
+    .dropdown-item {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+}
+
+/* Large screens - 3 columns */
+@media (min-width: 1200px) {
+    .dropdown-menu {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 600px;
+    }
+}
