@@ -290,12 +290,30 @@ const showMovieDetail = async (slug) => {
 
 // Play Movie
 window.playMovie = () => {
-    if (!state.currentMovie || !state.currentMovie.episodes || state.currentMovie.episodes.length === 0) {
-        alert('Không có tập phim nào để xem');
+    console.log('playMovie called');
+    console.log('state.currentMovie:', state.currentMovie);
+
+    if (!state.currentMovie) {
+        alert('Không tìm thấy thông tin phim. Vui lòng thử lại.');
+        console.error('state.currentMovie is null or undefined');
         return;
     }
 
-    const firstEpisode = state.currentMovie.episodes[0].server_data[0];
+    if (!state.currentMovie.episodes || !Array.isArray(state.currentMovie.episodes) || state.currentMovie.episodes.length === 0) {
+        alert('Phim này chưa có tập nào để xem.');
+        console.error('No episodes found:', state.currentMovie.episodes);
+        return;
+    }
+
+    const firstServer = state.currentMovie.episodes[0];
+    if (!firstServer.server_data || !Array.isArray(firstServer.server_data) || firstServer.server_data.length === 0) {
+        alert('Server không có dữ liệu phim.');
+        console.error('No server_data found:', firstServer);
+        return;
+    }
+
+    const firstEpisode = firstServer.server_data[0];
+    console.log('Playing episode:', firstEpisode);
     playEpisode(firstEpisode.link_embed, firstEpisode.name, 0, 0);
 };
 
