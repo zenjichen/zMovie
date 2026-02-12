@@ -254,43 +254,64 @@ const showMovieDetail = async (slug) => {
         }
     }
 
+    const content = movie.content ? movie.content.replace(/<[^>]*>/g, '') : 'Đang cập nhật nội dung...';
+
+    // Remove default padding for full-width layout
+    elements.modalBody.style.padding = '0';
+
     elements.modalBody.innerHTML = `
-        <div class="detail-header">
-            <div class="detail-poster">
-                <img src="${posterUrl}" alt="${movie.name}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+        <div class="detail-view">
+            <div class="detail-thumb-section" style="position: relative; width: 100%; height: 400px; overflow: hidden;">
+                <img src="${posterUrl}" alt="${movie.name}" class="detail-thumb-img" style="width: 100%; height: 100%; object-fit: cover; object-position: center top;">
+                <div class="detail-thumb-blur-overlay" style="position: absolute; inset: 0; box-shadow: inset 0 -100px 100px -20px var(--surface); pointer-events: none;"></div>
             </div>
-            <div class="detail-info">
-                <h2 class="detail-title">${movie.name}</h2>
-                <div class="detail-meta">
-                    <span><strong>Tên gốc:</strong> ${movie.origin_name || movie.name}</span>
-                    <span><strong>Năm:</strong> ${movie.year || 'N/A'}</span>
-                    <span><strong>Thời lượng:</strong> ${movie.time || 'N/A'}</span>
-                    <span><strong>Chất lượng:</strong> ${movie.quality || 'HD'}</span>
-                    <span><strong>Ngôn ngữ:</strong> ${movie.lang || 'Vietsub'}</span>
-                    <span><strong>Trạng thái:</strong> ${movie.episode_current || 'Full'}</span>
+            
+            <div class="detail-content-section" style="padding: 24px 32px; position: relative; margin-top: -60px; z-index: 10;">
+                <h2 class="detail-title-large" style="font-size: 36px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-bottom: 8px;">${movie.name}</h2>
+                <div class="detail-origin-title" style="color: var(--text-secondary); margin-bottom: 16px; font-size: 16px;">${movie.origin_name || ''} (${movie.year})</div>
+                
+                <div class="detail-meta-tags" style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <span class="meta-badge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 13px;">${movie.time || 'N/A'}</span>
+                    <span class="meta-badge quality" style="background: var(--success); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600;">${movie.quality || 'HD'}</span>
+                    <span class="meta-badge" style="border: 1px solid var(--border); padding: 3px 9px; border-radius: 6px; font-size: 13px;">${movie.lang || 'Vietsub'}</span>
+                    ${(movie.chieurap === 1 || movie.chieurap === true) ? '<span class="meta-badge" style="background: var(--warning); color: #000; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600;">Chiếu rạp</span>' : ''}
                 </div>
-                <p class="detail-description">${movie.content ? movie.content.replace(/<[^>]*>/g, '') : 'Đang cập nhật nội dung...'}</p>
-                <div class="detail-tags">
-                    <div class="tag"><strong>Thể loại:</strong> ${categories}</div>
-                    <div class="tag"><strong>Quốc gia:</strong> ${countries}</div>
-                </div>
-                <div class="detail-tags">
-                    <div class="tag"><strong>Đạo diễn:</strong> ${director}</div>
-                </div>
-                <div class="detail-tags">
-                    <div class="tag"><strong>Diễn viên:</strong> ${actors}</div>
-                </div>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" onclick="playMovie()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+
+                <div class="detail-actions-bar" style="margin-bottom: 24px;">
+                     <button class="btn btn-primary btn-large" onclick="playMovie()" style="padding: 12px 32px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 5v14l11-7z"/>
                         </svg>
-                        Xem phim
+                        <span>Xem Phim</span>
                     </button>
                 </div>
+
+                <div class="detail-description-text" style="line-height: 1.8; color: var(--text-secondary); margin-bottom: 32px;">${content}</div>
+                
+                <div class="detail-extra-info" style="display: grid; gap: 12px; background: var(--surface-light); padding: 20px; border-radius: 12px;">
+                    <div class="info-row" style="display: flex;">
+                         <span class="label" style="width: 100px; color: var(--text-secondary);">Đạo diễn:</span>
+                         <span class="value" style="color: var(--text);">${director}</span>
+                    </div>
+                    <div class="info-row" style="display: flex;">
+                         <span class="label" style="width: 100px; color: var(--text-secondary);">Diễn viên:</span>
+                         <span class="value" style="color: var(--text);">${actors}</span>
+                    </div>
+                    <div class="info-row" style="display: flex;">
+                         <span class="label" style="width: 100px; color: var(--text-secondary);">Thể loại:</span>
+                         <span class="value" style="color: var(--text);">${categories}</span>
+                    </div>
+                     <div class="info-row" style="display: flex;">
+                         <span class="label" style="width: 100px; color: var(--text-secondary);">Quốc gia:</span>
+                         <span class="value" style="color: var(--text);">${countries}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 0 32px 32px;">
+                 ${episodesHTML}
             </div>
         </div>
-        ${episodesHTML}
     `;
 };
 
@@ -329,8 +350,8 @@ window.playEpisode = (embedUrl, episodeName) => {
     elements.playerModal.classList.add('active');
 
     elements.playerContainer.innerHTML = `
-        <iframe src="${embedUrl}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-    `;
+    < iframe src = "${embedUrl}" allowfullscreen allow = "autoplay; encrypted-media" ></iframe >
+        `;
 };
 
 // Search Movies
@@ -371,10 +392,10 @@ const loadFilters = async () => {
     if (genresData && Array.isArray(genresData)) {
         state.genres = genresData;
         elements.genreDropdown.innerHTML = state.genres.map(genre => `
-            <a href="#the-loai/${genre.slug}" class="dropdown-item">
-                ${genre.name}
-            </a>
-        `).join('');
+        < a href = "#the-loai/${genre.slug}" class="dropdown-item" >
+            ${genre.name}
+            </a >
+    `).join('');
     }
 
     // Load countries - API returns direct array
@@ -382,16 +403,16 @@ const loadFilters = async () => {
     if (countriesData && Array.isArray(countriesData)) {
         state.countries = countriesData;
         elements.countryDropdown.innerHTML = state.countries.map(country => `
-            <a href="#quoc-gia/${country.slug}" class="dropdown-item">
-                ${country.name}
-            </a>
-        `).join('');
+    < a href = "#quoc-gia/${country.slug}" class="dropdown-item" >
+        ${country.name}
+            </a >
+    `).join('');
     }
 };
 
 // Load Movies by Genre
 window.loadMoviesByGenre = async (slug) => {
-    const data = await fetchAPI(`/v1/api/the-loai/${slug}`, { page: 1 });
+    const data = await fetchAPI(`/ v1 / api / the - loai / ${slug} `, { page: 1 });
 
     if (!data) {
         showError(elements.newMovies, 'Không có phim nào trong thể loại này');
@@ -419,7 +440,7 @@ window.loadMoviesByGenre = async (slug) => {
 
 // Load Movies by Country
 window.loadMoviesByCountry = async (slug) => {
-    const data = await fetchAPI(`/v1/api/quoc-gia/${slug}`, { page: 1 });
+    const data = await fetchAPI(`/ v1 / api / quoc - gia / ${slug} `, { page: 1 });
 
     if (!data) {
         showError(elements.newMovies, 'Không có phim nào từ quốc gia này');
@@ -632,25 +653,25 @@ const renderSuggestions = (movies) => {
     }
 
     const html = movies.slice(0, 5).map(movie => {
-        const posterUrl = `${processUrl(movie.poster_url || movie.thumb_url)}`;
+        const posterUrl = `${processUrl(movie.poster_url || movie.thumb_url)} `;
         const title = movie.name;
         const year = movie.year || 'N/A';
         const quality = movie.quality || 'HD';
         const type = movie.type === 'series' ? 'Phim bộ' : (movie.type === 'single' ? 'Phim lẻ' : 'Phim');
 
         return `
-            <div class="suggestion-item" onclick="selectSuggestion('${movie.slug}')">
-                <img src="${posterUrl}" alt="${title}" class="suggestion-poster" onerror="this.src='https://via.placeholder.com/40x60'">
-                <div class="suggestion-details">
-                    <div class="suggestion-title">${title}</div>
-                    <div class="suggestion-meta">
-                        <span class="suggestion-year">${year}</span>
-                        <span>${quality}</span>
-                        <span>• ${type}</span>
-                    </div>
+    < div class="suggestion-item" onclick = "selectSuggestion('${movie.slug}')" >
+        <img src="${posterUrl}" alt="${title}" class="suggestion-poster" onerror="this.src='https://via.placeholder.com/40x60'">
+            <div class="suggestion-details">
+                <div class="suggestion-title">${title}</div>
+                <div class="suggestion-meta">
+                    <span class="suggestion-year">${year}</span>
+                    <span>${quality}</span>
+                    <span>• ${type}</span>
                 </div>
             </div>
-        `;
+        </div>
+`;
     }).join('');
 
     searchSuggestionsContainer.innerHTML = html;
