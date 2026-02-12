@@ -68,9 +68,9 @@
     border-radius: 8px;
     transition: all 0.2s ease;
     font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Remove text truncation - show full text */
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .dropdown-item:hover {

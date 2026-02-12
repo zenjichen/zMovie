@@ -231,8 +231,8 @@ const showMovieDetail = async (slug) => {
                 <div class="episodes-section">
                     <h3 class="episodes-title">Danh sách tập phim</h3>
                     <div class="episodes-grid">
-                        ${serverData.server_data.map(ep => `
-                            <button class="episode-btn" onclick="playEpisode('${ep.link_embed}', '${ep.name}')">
+                        ${serverData.server_data.map((ep, idx) => `
+                            <button class="episode-btn" onclick="playEpisode('${ep.link_embed.replace(/'/g, "\\'")}', '${ep.name.replace(/'/g, "\\'")}', 0, ${idx})">
                                 ${ep.name}
                             </button>
                         `).join('')}
@@ -290,7 +290,7 @@ window.playMovie = () => {
     }
 
     const firstEpisode = state.currentMovie.episodes[0].server_data[0];
-    playEpisode(firstEpisode.link_embed, firstEpisode.name);
+    playEpisode(firstEpisode.link_embed, firstEpisode.name, 0, 0);
 };
 
 // Play Episode
