@@ -572,6 +572,98 @@ const initTypewriterEffect = () => {
     type();
 };
 
+// --- Search Suggestions Logic ---
+let searchDebounceTimeout;
+const searchSuggestionsContainer = document.getElementById('searchSuggestions');
+
+if (elements.searchInput && searchSuggestionsContainer) {
+    elements.searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+
+        if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
+
+        if (query.length < 2) {
+            searchSuggestionsContainer.classList.remove('active');
+            searchSuggestionsContainer.innerHTML = '';
+            return;
+        }
+
+        searchDebounceTimeout = setTimeout(() => {
+            fetchSearchSuggestions(query);
+        }, 300); // 300ms debounce
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!elements.searchInput.contains(e.target) && !searchSuggestionsContainer.contains(e.target)) {
+            searchSuggestionsContainer.classList.remove('active');
+        }
+    });
+
+    // Show suggestions on focus if input exists
+    elements.searchInput.addEventListener('focus', () => {
+        if (elements.searchInput.value.trim().length >= 2 && searchSuggestionsContainer.innerHTML !== '') {
+            searchSuggestionsContainer.classList.add('active');
+        }
+    });
+}
+
+const fetchSearchSuggestions = async (query) => {
+    try {
+        const data = await fetchAPI(API_ENDPOINTS.search, { keyword: query, limit: 5 });
+
+        if (!data) return;
+
+        let movies = [];
+        if (data.items) movies = data.items;
+        else if (data.data && data.data.items) movies = data.data.items;
+
+        renderSuggestions(movies);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+};
+
+const renderSuggestions = (movies) => {
+    if (!movies || movies.length === 0) {
+        searchSuggestionsContainer.innerHTML = '<div class="no-suggestions">Không tìm thấy kết quả</div>';
+        searchSuggestionsContainer.classList.add('active');
+        return;
+    }
+
+    const html = movies.slice(0, 5).map(movie => {
+        const posterUrl = `${processUrl(movie.poster_url || movie.thumb_url)}`;
+        const title = movie.name;
+        const year = movie.year || 'N/A';
+        const quality = movie.quality || 'HD';
+        const type = movie.type === 'series' ? 'Phim bộ' : (movie.type === 'single' ? 'Phim lẻ' : 'Phim');
+
+        return `
+            <div class="suggestion-item" onclick="selectSuggestion('${movie.slug}')">
+                <img src="${posterUrl}" alt="${title}" class="suggestion-poster" onerror="this.src='https://via.placeholder.com/40x60'">
+                <div class="suggestion-details">
+                    <div class="suggestion-title">${title}</div>
+                    <div class="suggestion-meta">
+                        <span class="suggestion-year">${year}</span>
+                        <span>${quality}</span>
+                        <span>• ${type}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    searchSuggestionsContainer.innerHTML = html;
+    searchSuggestionsContainer.classList.add('active');
+};
+
+window.selectSuggestion = (slug) => {
+    // Open movie detail
+    showMovieDetail(slug);
+    searchSuggestionsContainer.classList.remove('active');
+    elements.searchInput.value = ''; // Clear input
+};
+
 // Initialize App
 const init = async () => {
     console.log('🎬 Initializing zMovie App...');
