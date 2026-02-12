@@ -139,3 +139,159 @@
 .searching-indicator {
     animation: pulse 1.5s ease-in-out infinite;
 }
+
+/* Filter Controls */
+.filter-controls {
+    background: linear-gradient(135deg, rgba(243, 18, 96, 0.08), rgba(147, 51, 234, 0.08));
+    border: 1px solid rgba(243, 18, 96, 0.2);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.filter-controls label {
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.filter-select {
+    background: rgba(20, 20, 30, 0.9) !important;
+    border: 2px solid rgba(243, 18, 96, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    min-width: 180px;
+}
+
+.filter-select:hover {
+    border-color: rgba(243, 18, 96, 0.8) !important;
+    background: rgba(243, 18, 96, 0.15) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 18, 96, 0.4);
+}
+
+.filter-select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 4px rgba(243, 18, 96, 0.25), 0 4px 12px rgba(243, 18, 96, 0.4);
+    background: rgba(243, 18, 96, 0.2) !important;
+}
+
+.filter-select option {
+    background: #1a1a2e;
+    color: var(--text-primary);
+    padding: 12px;
+    font-weight: 500;
+}
+
+#movieCount {
+    font-weight: 700;
+    font-size: 15px;
+    background: linear-gradient(135deg, #f31260, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: rgba(243, 18, 96, 0.1);
+}
+
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 48px;
+    padding: 24px 0;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    background: linear-gradient(135deg, rgba(243, 18, 96, 0.1), rgba(147, 51, 234, 0.1));
+    border: 2px solid rgba(243, 18, 96, 0.3);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(243, 18, 96, 0.3), rgba(147, 51, 234, 0.3));
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 18, 96, 0.4);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pagination-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(243, 18, 96, 0.5);
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0 12px;
+}
+
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 16px 20px;
+    }
+
+    #movieCount {
+        margin-left: 0 !important;
+        margin-top: 8px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .filter-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .pagination-controls {
+        gap: 8px;
+    }
+
+    .pagination-btn {
+        min-width: 40px;
+        height: 40px;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}

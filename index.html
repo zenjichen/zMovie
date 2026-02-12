@@ -22,7 +22,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-content">
-                <div class="logo">
+                <a href="#" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                         <rect width="40" height="40" rx="8" fill="url(#gradient)" />
                         <path d="M12 14L20 10L28 14V26L20 30L12 26V14Z" stroke="white" stroke-width="2"
@@ -36,7 +36,7 @@
                         </defs>
                     </svg>
                     <span class="logo-text">CamCam</span>
-                </div>
+                </a>
 
                 <div class="nav-links">
                     <a href="#" class="nav-link active" data-page="home">Trang chủ</a>
@@ -184,10 +184,14 @@
 
             <!-- Filtered Movies (Genre/Country/Actor) -->
             <section class="movie-section" id="filteredSection" style="display: none;">
-                <div class="section-header">
-                    <h2 class="section-title" id="filteredTitle">Kết quả lọc</h2>
-                    <a href="#" onclick="window.location.hash=''; return false;" class="see-all">← Quay lại trang
-                        chủ</a>
+                <div class="section-header" style="display: block;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h2 class="section-title" style="margin: 0;">Kết quả lọc</h2>
+                        <a href="#" onclick="window.location.hash=''; return false;" class="see-all">← Quay lại trang
+                            chủ</a>
+                    </div>
+                    <div id="filteredTitle"></div>
                 </div>
                 <div class="movie-grid" id="filteredMovies"></div>
             </section>

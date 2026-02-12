@@ -1,4 +1,4 @@
-// Router and Advanced Search Features - Fixed Version
+// Router and Advanced Search Features - Enhanced Version
 
 // ========== HASH ROUTING ==========
 class Router {
@@ -9,6 +9,16 @@ class Router {
             'quoc-gia': (slug) => this.loadCountry(slug),
             'tim-kiem': (query) => this.loadSearch(query),
             'dien-vien': (name) => this.searchByActor(name)
+        };
+
+        this.currentData = {
+            type: null,
+            slug: null,
+            allMovies: [],
+            filteredMovies: [],
+            currentSort: 'newest',
+            currentPage: 1,
+            itemsPerPage: 20
         };
 
         window.addEventListener('hashchange', () => this.handleRoute());
@@ -27,104 +37,368 @@ class Router {
     }
 
     loadHome() {
-        // Hide filtered section
+        // Hide filtered section and show home sections
         const filteredSection = document.getElementById('filteredSection');
+        const heroSection = document.getElementById('heroSection');
+        const mainSections = document.querySelectorAll('.movie-section:not(#filteredSection)');
+
         if (filteredSection) {
             filteredSection.style.display = 'none';
         }
+
+        if (heroSection) {
+            heroSection.style.display = 'block';
+        }
+
+        mainSections.forEach(section => {
+            if (section.id !== 'filteredSection') {
+                section.style.display = 'block';
+            }
+        });
 
         // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    hideHomeSections() {
+        // Hide hero and main movie sections when viewing filtered content
+        const heroSection = document.getElementById('heroSection');
+        const mainSections = document.querySelectorAll('.movie-section:not(#filteredSection)');
+
+        if (heroSection) {
+            heroSection.style.display = 'none';
+        }
+
+        mainSections.forEach(section => {
+            if (section.id !== 'filteredSection') {
+                section.style.display = 'none';
+            }
+        });
+    }
+
+    createFilterControls() {
+        return `
+            <div class="filter-controls" style="margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <label style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">Sắp xếp:</label>
+                <select id="sortSelect" class="filter-select" style="
+                    background: var(--bg-secondary);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-radius: 8px;
+                    padding: 8px 16px;
+                    color: var(--text-primary);
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                ">
+                    <option value="newest">Mới nhất</option>
+                    <option value="oldest">Cũ nhất</option>
+                    <option value="name-az">Tên A-Z</option>
+                    <option value="name-za">Tên Z-A</option>
+                    <option value="year-desc">Năm giảm dần</option>
+                    <option value="year-asc">Năm tăng dần</option>
+                </select>
+                <span id="movieCount" style="margin-left: auto; color: var(--text-secondary); font-size: 14px;"></span>
+            </div>
+        `;
+    }
+
+    sortMovies(movies, sortType) {
+        const sorted = [...movies];
+
+        switch (sortType) {
+            case 'newest':
+                // API default order (modified time)
+                return sorted;
+            case 'oldest':
+                return sorted.reverse();
+            case 'name-az':
+                return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            case 'name-za':
+                return sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+            case 'year-desc':
+                return sorted.sort((a, b) => (b.year || 0) - (a.year || 0));
+            case 'year-asc':
+                return sorted.sort((a, b) => (a.year || 0) - (b.year || 0));
+            default:
+                return sorted;
+        }
+    }
+
+    renderMovies(movies, container) {
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (movies.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary); grid-column: 1/-1;">Không có phim nào</div>';
+            return;
+        }
+
+        // Calculate pagination
+        const totalPages = Math.ceil(movies.length / this.currentData.itemsPerPage);
+        const startIndex = (this.currentData.currentPage - 1) * this.currentData.itemsPerPage;
+        const endIndex = startIndex + this.currentData.itemsPerPage;
+        const currentPageMovies = movies.slice(startIndex, endIndex);
+
+        // Render current page movies
+        currentPageMovies.forEach(movie => {
+            container.appendChild(window.createMovieCard(movie));
+        });
+
+        // Update count
+        const countElement = document.getElementById('movieCount');
+        if (countElement) {
+            countElement.textContent = `Tổng: ${movies.length} phim`;
+        }
+
+        // Add pagination controls
+        this.renderPaginationControls(container, totalPages, movies.length);
+    }
+
+    renderPaginationControls(container, totalPages, totalMovies) {
+        if (totalPages <= 1) return; // No pagination needed for single page
+
+        const paginationDiv = document.createElement('div');
+        paginationDiv.className = 'pagination-controls';
+        paginationDiv.style.gridColumn = '1/-1';
+
+        let paginationHTML = '';
+
+        // Previous button
+        paginationHTML += `
+            <button class="pagination-btn" ${this.currentData.currentPage === 1 ? 'disabled' : ''} onclick="router.goToPage(${this.currentData.currentPage - 1})">
+                ← Trước
+            </button>
+        `;
+
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, this.currentData.currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // First page
+        if (startPage > 1) {
+            paginationHTML += `
+                <button class="pagination-btn" onclick="router.goToPage(1)">1</button>
+            `;
+            if (startPage > 2) {
+                paginationHTML += '<span class="pagination-info">...</span>';
+            }
+        }
+
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="pagination-btn ${i === this.currentData.currentPage ? 'active' : ''}" onclick="router.goToPage(${i})">
+                    ${i}
+                </button>
+            `;
+        }
+
+        // Last page
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHTML += '<span class="pagination-info">...</span>';
+            }
+            paginationHTML += `
+                <button class="pagination-btn" onclick="router.goToPage(${totalPages})">${totalPages}</button>
+            `;
+        }
+
+        // Next button
+        paginationHTML += `
+            <button class="pagination-btn" ${this.currentData.currentPage === totalPages ? 'disabled' : ''} onclick="router.goToPage(${this.currentData.currentPage + 1})">
+                Tiếp →
+            </button>
+        `;
+
+        // Page info
+        const startItem = (this.currentData.currentPage - 1) * this.currentData.itemsPerPage + 1;
+        const endItem = Math.min(this.currentData.currentPage * this.currentData.itemsPerPage, totalMovies);
+        paginationHTML += `
+            <span class="pagination-info">${startItem}-${endItem} / ${totalMovies}</span>
+        `;
+
+        paginationDiv.innerHTML = paginationHTML;
+        container.appendChild(paginationDiv);
+    }
+
+    goToPage(page) {
+        this.currentData.currentPage = page;
+        const filteredMovies = document.getElementById('filteredMovies');
+        const sorted = this.sortMovies(this.currentData.allMovies, this.currentData.currentSort);
+        this.renderMovies(sorted, filteredMovies);
+
+        // Scroll to top of filtered section
+        const filteredSection = document.getElementById('filteredSection');
+        if (filteredSection) {
+            filteredSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
     async loadGenre(slug) {
         if (!slug) return;
+
+        this.hideHomeSections();
 
         const genreName = window.state?.genres?.find(g => g.slug === slug)?.name || slug;
 
         // Show filtered section
         const filteredSection = document.getElementById('filteredSection');
+        const sectionTitle = filteredSection?.querySelector('.section-title');
         const filteredTitle = document.getElementById('filteredTitle');
         const filteredMovies = document.getElementById('filteredMovies');
 
         if (!filteredSection || !filteredTitle || !filteredMovies) return;
 
         filteredSection.style.display = 'block';
-        filteredTitle.textContent = `Thể loại: ${genreName}`;
-        filteredMovies.innerHTML = '<div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>';
+
+        // Update section title
+        if (sectionTitle) {
+            sectionTitle.textContent = `Thể loại: ${genreName}`;
+        }
+
+        // Add filter controls
+        filteredTitle.innerHTML = this.createFilterControls();
+
+        filteredMovies.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <div class="skeleton" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 12px;"></div>
+                <p style="margin-top: 16px; color: var(--text-secondary);">Đang tải phim...</p>
+            </div>
+        `;
 
         // Scroll to filtered section
         filteredSection.scrollIntoView({ behavior: 'smooth' });
 
-        // Load movies
-        const data = await window.fetchAPI(`/v1/api/the-loai/${slug}`, { page: 1 });
+        // Store current filter
+        this.currentData.type = 'genre';
+        this.currentData.slug = slug;
+        this.currentData.currentPage = 1; // Reset to first page
 
-        if (!data) {
-            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào trong thể loại này</div>';
+        // Load all pages
+        const allMovies = await this.loadAllPages(`/v1/api/the-loai/${slug}`);
+
+        if (allMovies.length === 0) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary); grid-column: 1/-1;">Không có phim nào trong thể loại này</div>';
             return;
         }
 
-        let movies = [];
-        if (data.items) {
-            movies = data.items;
-        } else if (data.data && data.data.items) {
-            movies = data.data.items;
+        this.currentData.allMovies = allMovies;
+        this.currentData.filteredMovies = allMovies;
+
+        // Setup sort handler
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.currentData.currentSort = e.target.value;
+                this.currentData.currentPage = 1; // Reset to first page when sorting
+                const sorted = this.sortMovies(this.currentData.allMovies, e.target.value);
+                this.renderMovies(sorted, filteredMovies);
+            });
         }
 
-        if (movies.length === 0) {
-            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào trong thể loại này</div>';
-            return;
-        }
-
-        filteredMovies.innerHTML = '';
-        movies.forEach(movie => {
-            filteredMovies.appendChild(window.createMovieCard(movie));
-        });
+        // Initial render
+        this.renderMovies(allMovies, filteredMovies);
     }
 
     async loadCountry(slug) {
         if (!slug) return;
 
+        this.hideHomeSections();
+
         const countryName = window.state?.countries?.find(c => c.slug === slug)?.name || slug;
 
         // Show filtered section
         const filteredSection = document.getElementById('filteredSection');
+        const sectionTitle = filteredSection?.querySelector('.section-title');
         const filteredTitle = document.getElementById('filteredTitle');
         const filteredMovies = document.getElementById('filteredMovies');
 
         if (!filteredSection || !filteredTitle || !filteredMovies) return;
 
         filteredSection.style.display = 'block';
-        filteredTitle.textContent = `Quốc gia: ${countryName}`;
-        filteredMovies.innerHTML = '<div class="skeleton" style="width: 100%; height: 300px; border-radius: 12px;"></div>';
+
+        // Update section title
+        if (sectionTitle) {
+            sectionTitle.textContent = `Quốc gia: ${countryName}`;
+        }
+
+        // Add filter controls
+        filteredTitle.innerHTML = this.createFilterControls();
+
+        filteredMovies.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <div class="skeleton" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 12px;"></div>
+                <p style="margin-top: 16px; color: var(--text-secondary);">Đang tải phim...</p>
+            </div>
+        `;
 
         // Scroll to filtered section
         filteredSection.scrollIntoView({ behavior: 'smooth' });
 
-        // Load movies
-        const data = await window.fetchAPI(`/v1/api/quoc-gia/${slug}`, { page: 1 });
+        // Store current filter
+        this.currentData.type = 'country';
+        this.currentData.slug = slug;
+        this.currentData.currentPage = 1; // Reset to first page
 
-        if (!data) {
-            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào từ quốc gia này</div>';
+        // Load all pages
+        const allMovies = await this.loadAllPages(`/v1/api/quoc-gia/${slug}`);
+
+        if (allMovies.length === 0) {
+            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary); grid-column: 1/-1;">Không có phim nào từ quốc gia này</div>';
             return;
         }
 
-        let movies = [];
-        if (data.items) {
-            movies = data.items;
-        } else if (data.data && data.data.items) {
-            movies = data.data.items;
+        this.currentData.allMovies = allMovies;
+        this.currentData.filteredMovies = allMovies;
+
+        // Setup sort handler
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.currentData.currentSort = e.target.value;
+                this.currentData.currentPage = 1; // Reset to first page when sorting
+                const sorted = this.sortMovies(this.currentData.allMovies, e.target.value);
+                this.renderMovies(sorted, filteredMovies);
+            });
         }
 
-        if (movies.length === 0) {
-            filteredMovies.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-secondary);">Không có phim nào từ quốc gia này</div>';
-            return;
+        // Initial render
+        this.renderMovies(allMovies, filteredMovies);
+    }
+
+    async loadAllPages(endpoint, maxPages = 5) {
+        let allMovies = [];
+
+        for (let page = 1; page <= maxPages; page++) {
+            const data = await window.fetchAPI(endpoint, { page });
+
+            if (!data) break;
+
+            let movies = [];
+            if (data.items) {
+                movies = data.items;
+            } else if (data.data && data.data.items) {
+                movies = data.data.items;
+            }
+
+            if (movies.length === 0) break;
+
+            allMovies = [...allMovies, ...movies];
+
+            // Check if there are more pages
+            const pagination = data.data?.params?.pagination;
+            if (pagination && page >= pagination.totalPages) {
+                break;
+            }
         }
 
-        filteredMovies.innerHTML = '';
-        movies.forEach(movie => {
-            filteredMovies.appendChild(window.createMovieCard(movie));
-        });
+        return allMovies;
     }
 
     async loadSearch(query) {

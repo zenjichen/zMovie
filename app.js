@@ -368,7 +368,7 @@ const loadFilters = async () => {
     if (genresData && Array.isArray(genresData)) {
         state.genres = genresData;
         elements.genreDropdown.innerHTML = state.genres.map(genre => `
-            <a href="#" class="dropdown-item" onclick="loadMoviesByGenre('${genre.slug}'); return false;">
+            <a href="#the-loai/${genre.slug}" class="dropdown-item">
                 ${genre.name}
             </a>
         `).join('');
@@ -379,7 +379,7 @@ const loadFilters = async () => {
     if (countriesData && Array.isArray(countriesData)) {
         state.countries = countriesData;
         elements.countryDropdown.innerHTML = state.countries.map(country => `
-            <a href="#" class="dropdown-item" onclick="loadMoviesByCountry('${country.slug}'); return false;">
+            <a href="#quoc-gia/${country.slug}" class="dropdown-item">
                 ${country.name}
             </a>
         `).join('');
