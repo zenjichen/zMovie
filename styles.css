@@ -399,28 +399,28 @@ body {
 }
 
 .hero-title {
-    font-size: 64px;
+    font-family: 'Playfair Display', serif;
+    font-size: 90px;
     font-weight: 900;
-    line-height: 1.1;
+    line-height: 1;
     margin-bottom: 24px;
 
-    /* Simple White with Thick Stroke */
+    /* White Color */
     color: #ffffff;
     text-transform: uppercase;
-    background: none;
-    -webkit-text-fill-color: initial;
-    -webkit-background-clip: border-box;
-    background-clip: border-box;
 
-    /* Simulated Thick Stroke */
+    /* Text Shadow for Glow & Heavy Stroke */
     text-shadow:
-        3px 3px 0 #000,
-        -2px -2px 0 #000,
-        2px -2px 0 #000,
-        -2px 2px 0 #000,
-        2px 2px 0 #000;
+        /* Heavy Stroke (Black) */
+        3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+        /* Outer Glow (Cyan/White) */
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 40px rgba(0, 255, 255, 0.3);
 
-    letter-spacing: -2px;
+    /* Apply Noise Filter for Texture */
+    filter: url(#noise);
+
+    letter-spacing: 1px;
     animation: fadeInUp 0.8s ease-out;
 }
 
