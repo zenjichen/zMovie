@@ -1,66 +1,66 @@
-/* Floating QR Code Widget */
+/* Floating QR Code Widget - Clean Design */
 .qr-code-widget {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 9999;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    transform-origin: bottom right;
+    animation: wave-repeat 7s ease-in-out infinite;
+    animation-delay: 5s;
 }
 
 .qr-code-widget img {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    box-shadow:
-        0 4px 15px rgba(0, 0, 0, 0.4),
-        0 0 20px rgba(212, 175, 55, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(212, 175, 55, 0.4);
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(24, 24, 27, 0.9);
-    padding: 4px;
-    backdrop-filter: blur(10px);
+    display: block;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .qr-code-widget:hover {
-    transform: scale(1.05);
+    animation: none;
 }
 
 .qr-code-widget:hover img {
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
     box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.6),
-        0 0 40px rgba(212, 175, 55, 0.5),
-        0 0 60px rgba(255, 215, 0, 0.3),
-        inset 0 2px 0 rgba(255, 255, 255, 0.3);
-    border-color: #f4e5b1;
-    border-width: 3px;
-    padding: 8px;
+        0 12px 40px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(212, 175, 55, 0.4);
 }
 
-/* Animation for QR code appearance */
-@keyframes qr-pulse {
+/* Wave animation - repeats every 7s after initial 5s delay */
+@keyframes wave-repeat {
 
     0%,
+    91.4% {
+        transform: rotate(0deg);
+    }
+
+    91.5% {
+        transform: rotate(14deg);
+    }
+
+    92.8% {
+        transform: rotate(-8deg);
+    }
+
+    94.2% {
+        transform: rotate(14deg);
+    }
+
+    95.7% {
+        transform: rotate(-4deg);
+    }
+
+    97.1% {
+        transform: rotate(10deg);
+    }
+
+    98.5%,
     100% {
-        box-shadow:
-            0 4px 15px rgba(0, 0, 0, 0.4),
-            0 0 20px rgba(212, 175, 55, 0.3);
+        transform: rotate(0deg);
     }
-
-    50% {
-        box-shadow:
-            0 4px 15px rgba(0, 0, 0, 0.4),
-            0 0 30px rgba(212, 175, 55, 0.5);
-    }
-}
-
-.qr-code-widget img {
-    animation: qr-pulse 3s infinite;
-}
-
-.qr-code-widget:hover img {
-    animation: none;
 }
