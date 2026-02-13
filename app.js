@@ -312,21 +312,21 @@ const showMovieDetail = async (slug) => {
                 <div class="detail-description-text" style="line-height: 1.8; color: var(--text-secondary); margin-bottom: 32px;">${content}</div>
                 
                 <div class="detail-extra-info" style="display: grid; gap: 12px; background: var(--surface-light); padding: 20px; border-radius: 12px;">
-                    <div class="info-row" style="display: flex;">
-                         <span class="label" style="width: 100px; color: var(--text-secondary);">Đạo diễn:</span>
-                         <span class="value" style="color: var(--text);">${director}</span>
+                    <div class="info-row" style="display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start;">
+                         <span class="label" style="color: var(--text-secondary); font-weight: 500;">Đạo diễn:</span>
+                         <span class="value" style="color: var(--text); line-height: 1.6;">${director}</span>
                     </div>
-                    <div class="info-row" style="display: flex;">
-                         <span class="label" style="width: 100px; color: var(--text-secondary);">Diễn viên:</span>
-                         <span class="value" style="color: var(--text);">${actors}</span>
+                    <div class="info-row" style="display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start;">
+                         <span class="label" style="color: var(--text-secondary); font-weight: 500;">Diễn viên:</span>
+                         <span class="value" style="color: var(--text); line-height: 1.6;">${actors}</span>
                     </div>
-                    <div class="info-row" style="display: flex;">
-                         <span class="label" style="width: 100px; color: var(--text-secondary);">Thể loại:</span>
-                         <span class="value" style="color: var(--text);">${categories}</span>
+                    <div class="info-row" style="display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start;">
+                         <span class="label" style="color: var(--text-secondary); font-weight: 500;">Thể loại:</span>
+                         <span class="value" style="color: var(--text); line-height: 1.6;">${categories}</span>
                     </div>
-                     <div class="info-row" style="display: flex;">
-                         <span class="label" style="width: 100px; color: var(--text-secondary);">Quốc gia:</span>
-                         <span class="value" style="color: var(--text);">${countries}</span>
+                     <div class="info-row" style="display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start;">
+                         <span class="label" style="color: var(--text-secondary); font-weight: 500;">Quốc gia:</span>
+                         <span class="value" style="color: var(--text); line-height: 1.6;">${countries}</span>
                     </div>
                 </div>
             </div>
