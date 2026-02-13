@@ -1,0 +1,66 @@
+/* Floating QR Code Widget */
+.qr-code-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.qr-code-widget img {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(212, 175, 55, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(24, 24, 27, 0.9);
+    padding: 4px;
+    backdrop-filter: blur(10px);
+}
+
+.qr-code-widget:hover {
+    transform: scale(1.05);
+}
+
+.qr-code-widget:hover img {
+    width: 200px;
+    height: 200px;
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(212, 175, 55, 0.5),
+        0 0 60px rgba(255, 215, 0, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    border-color: #f4e5b1;
+    border-width: 3px;
+    padding: 8px;
+}
+
+/* Animation for QR code appearance */
+@keyframes qr-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.4),
+            0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    50% {
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.4),
+            0 0 30px rgba(212, 175, 55, 0.5);
+    }
+}
+
+.qr-code-widget img {
+    animation: qr-pulse 3s infinite;
+}
+
+.qr-code-widget:hover img {
+    animation: none;
+}
