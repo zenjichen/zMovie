@@ -1,34 +1,29 @@
 /* Movie Card Title Bottom */
 .movie-title-bottom {
-    padding: 12px 8px;
+    padding: 10px 8px;
+    /* Slightly reduced padding */
     background: var(--surface);
-    /* Changed from undefined var(--card-bg) */
+    /* Fix undefined var */
     color: var(--text);
-    /* Changed from undefined var(--text-primary) */
+    /* Fix undefined var */
     font-size: 14px;
-    /* Using px for consistency, or 0.9rem */
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
     line-height: 1.4;
     min-height: 50px;
-    /* Flexbox for centering - this disables line-clamp in some browsers if not careful, 
-       but for pure text centering flex is good. 
-       However, for multi-line ellipsis, we need -webkit-box. 
-       Let's prioritize the text visibility first. 
-    */
+
+    /* Fix layout and centering */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
+    -webkit-box-pack: center;
+    /* Vertically center in box */
     overflow: hidden;
     text-overflow: ellipsis;
-    /* Center text vertically in the box if lines < 2? 
-       -webkit-box-pack: center (horizontal) 
-       -webkit-box-align: center (vertical) -> doesn't always work well with clamp
-    */
-    -webkit-box-pack: center;
-    /* This centers strictly in the box direction (vertical) -> vertically centered */
-    /* To center text horizontally text-align: center is enough */
+
+    /* Prevent squashing */
+    flex-shrink: 0;
 
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -38,7 +33,13 @@
     transition: opacity 0.3s ease, max-height 0.3s ease;
 }
 
-/* content removed to prevent layout shift */
+.movie-card:hover .movie-title-bottom {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 8px;
+    min-height: 0;
+    overflow: hidden;
+}
 
 /* Adjust movie card to accommodate title */
 .movie-card {
