@@ -31,7 +31,7 @@ const elements = {
     heroDescription: document.querySelector('.hero-description'),
     heroYear: document.getElementById('heroYear'),
     heroPlayBtn: document.getElementById('heroPlayBtn'),
-    heroInfoBtn: document.getElementById('heroInfoBtn'),
+
     newMovies: document.getElementById('newMovies'),
     singleMovies: document.getElementById('singleMovies'),
     seriesMovies: document.getElementById('seriesMovies'),
@@ -197,7 +197,7 @@ const loadHeroMovie = async () => {
 
     // Set button actions
     elements.heroPlayBtn.onclick = () => showMovieDetail(movie.slug);
-    elements.heroInfoBtn.onclick = () => showMovieDetail(movie.slug);
+
 };
 
 // Show Movie Detail
