@@ -379,42 +379,45 @@ body {
 }
 
 .hero-badge {
-    display: inline-block;
-    padding: 6px 16px;
-    background: rgba(243, 18, 96, 0.2);
-    border: 1px solid var(--primary);
-    border-radius: 20px;
-    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 69, 0, 0.2);
+    border: 1px solid #ff4500;
+    border-radius: 50px;
+    color: #ff4500;
     font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .hero-title {
-    font-size: 56px;
+    font-size: 64px;
     font-weight: 900;
     line-height: 1.1;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 
-    /* Teen Gradient: Neon Pink -> Purple -> Blue */
-    background: linear-gradient(to right, #ff00cc 0%, #333399 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
+    /* Simple White with Thick Stroke */
+    color: #ffffff;
+    text-transform: uppercase;
+    background: none;
+    -webkit-text-fill-color: initial;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
 
-    /* Transparent fill to show gradient */
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    /* Simulated Thick Stroke */
+    text-shadow:
+        3px 3px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
 
-    /* 3px Black Stroke */
-    -webkit-text-stroke: 3px black;
-
-    /* Strong Drop Shadow */
-    filter: drop-shadow(0 4px 0px rgba(0, 0, 0, 1));
-
+    letter-spacing: -2px;
     animation: fadeInUp 0.8s ease-out;
-    letter-spacing: -1px;
 }
 
 .hero-description {
@@ -436,13 +439,30 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 700;
+}
+
+/* HD Badge: Boxed, White Background, Black Text */
+.meta-item:first-child {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #ffffff;
+}
+
+/* Year Badge: Boxed, Transparent Dark Background, White Text */
+.meta-item:nth-child(2) {
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(4px);
 }
 
 .meta-item svg {
-    opacity: 0.7;
+    width: 16px;
+    height: 16px;
 }
 
 .hero-actions {
