@@ -610,42 +610,62 @@ window.showMovieDetail = showMovieDetail;
 
 // Typewriter Title Effect
 const initTypewriterEffect = () => {
-    const text = "zMovie - Xem Phim Online";
-    let i = 0;
+    const titles = [
+        "zMovie",
+        "Xem Phim Online",
+        "Miễn Phí",
+        "Chất Lượng Cao"
+    ];
+    let currentTitleIndex = 0;
+    let charIndex = 0;
     let isDeleting = false;
     let blink = true;
 
-    // Separate cursor blinking
+    // Cursor blinking independent of typing
     setInterval(() => {
         blink = !blink;
-        update();
+        updateTitle();
     }, 500);
 
-    function update() {
-        const current = text.substring(0, i);
+    function updateTitle() {
+        const currentTitle = titles[currentTitleIndex];
+        const displayedText = currentTitle.substring(0, charIndex);
         const cursor = blink ? "|" : " ";
-        document.title = (current || " ") + cursor;
+        document.title = (displayedText || " ") + cursor;
     }
 
-    function loop() {
-        if (!isDeleting && i < text.length) {
-            i++;
-            update();
-            setTimeout(loop, 120); // Typing speed
-        } else if (isDeleting && i > 0) {
-            i--;
-            update();
-            setTimeout(loop, 60); // Deleting speed
-        } else if (i === text.length) {
-            isDeleting = true;
-            setTimeout(loop, 3000); // Pause at end
-        } else if (i === 0) {
-            isDeleting = false;
-            setTimeout(loop, 1000); // Pause at start
+    function type() {
+        const currentTitle = titles[currentTitleIndex];
+
+        if (isDeleting) {
+            charIndex--;
+            updateTitle();
+        } else {
+            charIndex++;
+            updateTitle();
         }
+
+        let typeSpeed = 100;
+
+        if (isDeleting) {
+            typeSpeed /= 2; // Deleting is faster
+        }
+
+        if (!isDeleting && charIndex === currentTitle.length) {
+            // Finished typing current title, pause before deleting
+            typeSpeed = 2000;
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            // Finished deleting, move to next title
+            isDeleting = false;
+            currentTitleIndex = (currentTitleIndex + 1) % titles.length;
+            typeSpeed = 500; // Pause before typing next
+        }
+
+        setTimeout(type, typeSpeed);
     }
 
-    loop();
+    type();
 };
 
 // --- Search Suggestions Logic ---
