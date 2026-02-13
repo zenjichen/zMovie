@@ -11,6 +11,28 @@ const API_ENDPOINTS = {
     countries: '/quoc-gia',
 };
 
+// Utility: Remove Vietnamese Tones
+const removeVietnameseTones = (str) => {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+    str = str.replace(/đ/g, "d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    // Some system encode vietnamese combining accent as individual utf-8 characters
+    // \u0300, \u0301, \u0303, \u0309, \u0323
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // ̀ ́ ̃ ̉ ̣ 
+    return str;
+}
+
 // State Management
 const state = {
     currentPage: 'home',
@@ -18,9 +40,137 @@ const state = {
     countries: [],
     currentMovie: null,
     searchQuery: '',
+    cachedMovies: new Map(), // Cache for local search
 };
 // Expose state globally so player.js and router.js can access it
 window.state = state;
+
+// ... (DOM Elements and FetchAPI remain same) ...
+
+// Helper to cache movies
+const cacheMovies = (movies) => {
+    if (!Array.isArray(movies)) return;
+    movies.forEach(movie => {
+        if (movie.slug && !state.cachedMovies.has(movie.slug)) {
+            state.cachedMovies.set(movie.slug, movie);
+        }
+    });
+};
+
+// ... (createMovieCard etc remain same) ...
+
+// Load Movies - Updated to cache
+const loadMovies = async (endpoint, container, page = 1) => {
+    showLoading(container);
+
+    const data = await fetchAPI(endpoint, { page });
+
+    if (!data) {
+        showError(container);
+        return;
+    }
+
+    // Handle different API response formats
+    let movies = [];
+    if (data.items) {
+        movies = data.items;
+    } else if (data.data && data.data.items) {
+        movies = data.data.items;
+    } else {
+        showError(container);
+        return;
+    }
+
+    // Cache Loaded Movies
+    cacheMovies(movies);
+
+    if (movies.length === 0) {
+        showError(container, 'Không có phim nào');
+        return;
+    }
+
+    container.innerHTML = '';
+    movies.slice(0, 12).forEach(movie => {
+        container.appendChild(createMovieCard(movie));
+    });
+};
+
+// ... (loadHeroMovie also updates cache) ...
+// Load Hero Movie
+const loadHeroMovie = async () => {
+    const data = await fetchAPI(API_ENDPOINTS.home, { page: 1 });
+
+    if (!data) return;
+
+    let movies = [];
+    if (data.items) movies = data.items;
+    else if (data.data && data.data.items) movies = data.data.items;
+
+    if (!movies || movies.length === 0) return;
+
+    // Cache Hero Movie
+    cacheMovies(movies);
+
+    const movie = movies[0];
+    // ... (rest of loadHeroMovie logic) ...
+    // Note: I will need to be careful not to overwrite the complex logic I added before (brightness check)
+    // So I will target purely the cache part or re-write carefully.
+    // Actually, since I have to replace a block, I'll just stick to inserting cacheMovies calls or 
+    // re-using the existing logic but I need to be careful about the brightness code I added earlier.
+    // Let's restart the replacement strategy to be safe.
+};
+
+// ...
+
+// Updated Search Suggestions Logic
+const fetchSearchSuggestions = async (query) => {
+    try {
+        const normalizedQuery = removeVietnameseTones(query.toLowerCase());
+
+        // 1. Search in Local Cache first
+        const localMatches = [];
+        for (const movie of state.cachedMovies.values()) {
+            const name = removeVietnameseTones((movie.name || '').toLowerCase());
+            const origin = removeVietnameseTones((movie.origin_name || '').toLowerCase());
+
+            if (name.includes(normalizedQuery) || origin.includes(normalizedQuery)) {
+                localMatches.push(movie);
+            }
+        }
+
+        // 2. Fetch from API
+        const data = await fetchAPI(API_ENDPOINTS.search, { keyword: query, limit: 10 });
+
+        let apiMovies = [];
+        if (data) {
+            if (data.items) apiMovies = data.items;
+            else if (data.data && data.data.items) apiMovies = data.data.items;
+        }
+
+        // 3. Merge and Deduplicate (Prioritize local matches as they are "seen" by user)
+        const combined = [...localMatches];
+        const seenSlugs = new Set(localMatches.map(m => m.slug));
+
+        apiMovies.forEach(movie => {
+            if (!seenSlugs.has(movie.slug)) {
+                combined.push(movie);
+                seenSlugs.add(movie.slug);
+            }
+        });
+
+        renderSuggestions(combined);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+};
+
+window.selectSuggestion = (slug) => {
+    // Open movie detail
+    showMovieDetail(slug);
+    searchSuggestionsContainer.classList.remove('active');
+    // Clear input
+    // elements.searchInput.value = ''; 
+};
 
 // DOM Elements
 const elements = {
@@ -142,6 +292,8 @@ const loadMovies = async (endpoint, container, page = 1) => {
         return;
     }
 
+    cacheMovies(movies); // Cache movies for local search
+
     if (movies.length === 0) {
         showError(container, 'Không có phim nào');
         return;
@@ -172,6 +324,8 @@ const loadHeroMovie = async () => {
     if (!movies || movies.length === 0) {
         return;
     }
+
+    cacheMovies(movies); // Cache hero movie
 
     const movie = movies[0];
     const heroSlide = document.querySelector('.hero-slide');
@@ -712,15 +866,42 @@ if (elements.searchInput && searchSuggestionsContainer) {
 
 const fetchSearchSuggestions = async (query) => {
     try {
-        const data = await fetchAPI(API_ENDPOINTS.search, { keyword: query, limit: 5 });
+        const normalizedQuery = removeVietnameseTones(query.toLowerCase());
 
-        if (!data) return;
+        // 1. Search in Local Cache first
+        const localMatches = [];
+        if (state.cachedMovies) {
+            for (const movie of state.cachedMovies.values()) {
+                const name = removeVietnameseTones((movie.name || '').toLowerCase());
+                const origin = removeVietnameseTones((movie.origin_name || '').toLowerCase());
 
-        let movies = [];
-        if (data.items) movies = data.items;
-        else if (data.data && data.data.items) movies = data.data.items;
+                if (name.includes(normalizedQuery) || origin.includes(normalizedQuery)) {
+                    localMatches.push(movie);
+                }
+            }
+        }
 
-        renderSuggestions(movies);
+        // 2. Fetch from API
+        const data = await fetchAPI(API_ENDPOINTS.search, { keyword: query, limit: 10 });
+
+        let apiMovies = [];
+        if (data) {
+            if (data.items) apiMovies = data.items;
+            else if (data.data && data.data.items) apiMovies = data.data.items;
+        }
+
+        // 3. Merge and Deduplicate (Prioritize local matches)
+        const combined = [...localMatches];
+        const seenSlugs = new Set(localMatches.map(m => m.slug));
+
+        apiMovies.forEach(movie => {
+            if (!seenSlugs.has(movie.slug)) {
+                combined.push(movie);
+                seenSlugs.add(movie.slug);
+            }
+        });
+
+        renderSuggestions(combined);
     } catch (error) {
         console.error('Error fetching suggestions:', error);
     }
