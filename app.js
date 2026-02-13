@@ -562,7 +562,13 @@ elements.searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const query = e.target.value.trim();
         if (query) {
-            searchMovies(query);
+            // Use router hash for search
+            window.location.hash = `tim-kiem/${encodeURIComponent(query)}`;
+            // Close mobile menu if open
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks && navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            }
         }
     }
 });
