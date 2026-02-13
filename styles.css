@@ -388,11 +388,13 @@ body {
     background: linear-gradient(to top, var(--background) 0%, transparent 50%);
 }
 
+/* Hero Content Redesign */
 .hero-content {
     position: relative;
     z-index: 10;
     padding: 120px 0 80px;
     max-width: 900px;
+    text-align: left;
 }
 
 .hero-badge {
@@ -400,15 +402,32 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: rgba(255, 69, 0, 0.2);
-    border: 1px solid #ff4500;
+    background: rgba(243, 18, 96, 0.15);
+    /* Primary tint */
+    border: 1px solid var(--primary);
     border-radius: 50px;
-    color: #ff4500;
+    color: var(--primary);
     font-size: 13px;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    box-shadow: 0 0 20px rgba(243, 18, 96, 0.3);
+    /* Glow effect */
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+}
+
+.hero-badge:hover {
+    box-shadow: 0 0 30px rgba(243, 18, 96, 0.5);
+    background: rgba(243, 18, 96, 0.25);
+    transform: translateY(-2px);
+}
+
+.hero-badge svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
 }
 
 .hero-title {
@@ -441,16 +460,29 @@ body {
 .hero-description {
     font-size: 18px;
     color: var(--text-secondary);
-    margin-bottom: 24px;
-    line-height: 1.6;
+    /* Keep as is or lighten slightly */
+    color: #cbd5e1;
+    /* Lighter grey for better readability on dark BG */
+    margin-bottom: 32px;
+    line-height: 1.8;
+    max-width: 800px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    /* Better contrast */
     animation: fadeInUp 0.8s ease-out 0.2s both;
+    /* Optional: Clamp description */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .hero-meta {
     display: flex;
-    gap: 24px;
-    margin-bottom: 32px;
+    gap: 16px;
+    margin-bottom: 40px;
     animation: fadeInUp 0.8s ease-out 0.3s both;
+    align-items: center;
 }
 
 .meta-item {
@@ -458,29 +490,40 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
+    /* Slightly rounder */
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
-/* HD Badge: Boxed, White Background, Black Text */
+/* HD Badge: Premium Gold/Boxed Look */
 .meta-item:first-child {
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    /* Glass white */
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Year Badge: Boxed, Transparent Dark Background, White Text */
+/* Year Badge: Clean Glass */
 .meta-item:nth-child(2) {
-    background: rgba(0, 0, 0, 0.6);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.4);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(4px);
 }
 
+.meta-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .meta-item svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    /* Slightly larger icons */
+    height: 18px;
 }
 
 .hero-actions {
@@ -579,25 +622,43 @@ body {
     }
 }
 
+/* Glass Button Style for "Chi tiết" */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+.btn-glass svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-glass:hover svg {
+    transform: scale(1.1);
+}
+
+/* Secondary Button (if reused elsewhere) */
 .btn-secondary {
-    background: linear-gradient(135deg, #4a4a4a 0%, #6a6a6a 50%, #4a4a4a 100%);
-    background-size: 200% 100%;
+    background: var(--surface-light);
     color: var(--text);
-    border: 2px solid #888;
-    box-shadow:
-        0 4px 15px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #5a5a5a 0%, #7a7a7a 50%, #5a5a5a 100%);
-    border-color: #aaa;
-    transform: translateY(-2px);
-    box-shadow:
-        0 6px 20px rgba(255, 255, 255, 0.15),
-        0 0 30px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    background: var(--border);
+    color: var(--text);
 }
 
 
