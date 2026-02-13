@@ -153,6 +153,6 @@ Không có lỗi đã biết. Tất cả tính năng hoạt động ổn định
 
 ---
 
-**Phát triển bởi**: Antigravity AI
+**Phát triển bởi**: zenjichen
 **Ngày hoàn thành**: 2026-02-13
 **Version**: 2.0.0

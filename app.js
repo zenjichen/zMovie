@@ -192,7 +192,7 @@ const loadHeroMovie = async () => {
     elements.heroTitle.textContent = movie.name;
     elements.heroDescription.textContent = movie.content ?
         movie.content.replace(/<[^>]*>/g, '').substring(0, 200) + '...' :
-        'Xem ngay để khám phá nội dung hấp dẫn!';
+        'Mạnh Hà kính chúc anh chị em, cô dì, chú bác có một buổi xem phim vui vẻ nhé ! ^^';
     elements.heroYear.textContent = movie.year || new Date().getFullYear();
 
     // Set button actions

@@ -208,4 +208,4 @@ A: Có thể! Dùng localStorage để lưu sort preference của user
 
 ---
 
-**Developed with ❤️ by Antigravity AI**
+**Developed with ❤️ by zenjichen**
