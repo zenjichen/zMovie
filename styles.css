@@ -379,7 +379,7 @@ body {
     position: relative;
     z-index: 10;
     padding: 120px 0 80px;
-    max-width: 700px;
+    max-width: 900px;
 }
 
 .hero-badge {
@@ -400,9 +400,10 @@ body {
 
 .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: 90px;
+    font-size: clamp(40px, 6vw, 80px);
+    /* Responsive font size */
     font-weight: 900;
-    line-height: 1;
+    line-height: 1.1;
     margin-bottom: 24px;
 
     /* White Color */
